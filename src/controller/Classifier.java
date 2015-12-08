@@ -20,7 +20,8 @@ public class Classifier {
 	static File[] files = new File[0];
 	
 	public static void main(String[] args) {
-		File test = new File("");
+		String path = new File("").getAbsolutePath()+"\\Train\\blogs";
+		File test = new File(path);
 		String[] classes = new String[2];
 		classes[0] = "M";
 		classes[1] = "F";
@@ -29,22 +30,26 @@ public class Classifier {
 	}
 	
 	public void TrainMultinomialNaiveBayes(String[] c, File folder) {		
+		
 		vocabulary = ExtractVocabulary(folder);
 		countNumberOfDocs = CountNumberOfDocs(folder);
-		System.out.println(countNumberOfDocs);
 		for(String sort : c){
 			countDocsInClass = countDocsInClass(sort, folder);
-			System.out.println(countDocsInClass);
 			prior = ((float)countDocsInClass)/countNumberOfDocs;
-			System.out.println(prior);
 			vocabularyInClass = ConcatenateAllTextsOfDocsInClass(sort, folder);
 			for(String t : vocabulary) {
+				float chance = 0;
+				int countOfWord = 0;
+				int countOfAllWords = 0;
 				for(String s : vocabularyInClass) {
-					
+					countOfAllWords++;
+					if(t.equals(s)) {
+						countOfWord++;
+					}
 				}
+				chance = (countOfWord+1)/(countOfAllWords+2);
 			}
 		}
-		
 	}
 
 	private static List<String> ConcatenateAllTextsOfDocsInClass(String c, File folder) {
