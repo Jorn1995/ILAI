@@ -66,7 +66,7 @@ public class Classifier {
 
 	private static List<String> ExtractVocabulary(File folder) {
 		files = fileLister(folder);
-		ArrayList<String> tokenizedResult = new ArrayList<String>();
+		List<String> tokenizedResult = new ArrayList<String>();
 		String result = "";
 		 for (File file : files) {
 			 try {
@@ -81,7 +81,11 @@ public class Classifier {
 				e.printStackTrace();
 			}
 		    }
-//		 String tokenizedResult = new Tokenizer().tokenize(result);
+		try {
+			tokenizedResult = new Tokenizer().tokenizer(result);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return tokenizedResult;
 	}
 
