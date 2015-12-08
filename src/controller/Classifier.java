@@ -2,57 +2,87 @@ package controller;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Classifier {
 
-	String vocabulary;
-	String vocabularyInClass;
+	List<String> vocabulary;
+	List<String> vocabularyInClass;
 	int countNumberOfDocs;
 	int countDocsInClass;
-	int prior;
+	float prior;
 	static File[] files = new File[0];
 	
 	public static void main(String[] args) {
-		File test = new File("C:\\Users\\JornB\\Downloads\\blogs");
-		System.out.println(CountNumberOfDocs(test));
+		File test = new File("");
+		String[] classes = new String[2];
+		classes[0] = "M";
+		classes[1] = "F";
+		new Classifier().TrainMultinomialNaiveBayes(classes, test);;
+		
 	}
 	
-	public void TrainMultinomialNaiveBayes(List<Class> c, File folder) {		
+	public void TrainMultinomialNaiveBayes(String[] c, File folder) {		
 		vocabulary = ExtractVocabulary(folder);
 		countNumberOfDocs = CountNumberOfDocs(folder);
-		for(Class sort : c){
+		System.out.println(countNumberOfDocs);
+		for(String sort : c){
 			countDocsInClass = countDocsInClass(sort, folder);
-			prior = countDocsInClass/countNumberOfDocs;
-			vocabularyInClass = ConcatenateAllTextsOfDocsInClass(folder, c);
+			System.out.println(countDocsInClass);
+			prior = ((float)countDocsInClass)/countNumberOfDocs;
+			System.out.println(prior);
+			vocabularyInClass = ConcatenateAllTextsOfDocsInClass(sort, folder);
+			for(String t : vocabulary) {
+				for(String s : vocabularyInClass) {
+					
+				}
+			}
 		}
 		
 	}
 
-	private String ConcatenateAllTextsOfDocsInClass(File folder, List<Class> c) {
-		
-		return null;
+	private static List<String> ConcatenateAllTextsOfDocsInClass(String c, File folder) {
+		File folderOfClass = new File (folder.getAbsolutePath()+"\\"+c);
+		File[] filesOfClass = fileLister(folderOfClass);
+		return ExtractVocabulary(folderOfClass);
 	}
 
-	private int countDocsInClass(Class a, File folder) {
-		return 0; 
+	private static int countDocsInClass(String c, File folder) {
+		File folderOfClass = new File (folder.getAbsolutePath()+"\\"+c);
+		File[] filesOfClass = fileLister(folderOfClass);
+		return filesOfClass.length; 
 	}
 
 	private static int CountNumberOfDocs(File folder) {
-		File[] files = fileLister(folder);
+		files = fileLister(folder);
 		return files.length;
 	}
 
-	private String ExtractVocabulary(File folder) {
+	private static List<String> ExtractVocabulary(File folder) {
 		files = fileLister(folder);
+		ArrayList<String> tokenizedResult = new ArrayList<String>();
 		String result = "";
 		 for (File file : files) {
-			 
+			 try {
+				 String line ="";
+				BufferedReader br = new BufferedReader(new FileReader(file));
+				while(br.ready()) {
+					result += br.readLine();
+				}
+			} catch (FileNotFoundException e) {
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		    }
-		return result;
+//		 String tokenizedResult = new Tokenizer().tokenize(result);
+		return tokenizedResult;
 	}
 
 	private static File[] fileLister(File folder) {
