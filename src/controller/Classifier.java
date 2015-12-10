@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class Classifier {
 
@@ -21,14 +22,19 @@ public class Classifier {
 	float prior;
 	static File[] files = new File[0];
 	Map<String, Map<String, Double>> map;
+	Map<String, Double> priormap;
 
 	public static void main(String[] args) {
 		String path = new File("").getAbsolutePath()+"\\Train\\blogs";
+		String testfilepath = new File("").getAbsolutePath()+"\\Train\\testfile\\F-test20.txt";
 		File test = new File(path);
+		File testfile = new File(testfilepath);
 		String[] classes = new String[2];
 		classes[0] = "M";
 		classes[1] = "F";
-		new Classifier().TrainBinominalNaiveBayes(classes, test);
+		Classifier classifier = new Classifier();
+		classifier.TrainBinominalNaiveBayes(classes, test);
+		classifier.ApplyBinominalNaiveBayes(classes, testfile, test);
 
 	}
 
@@ -36,10 +42,12 @@ public class Classifier {
 		map = new HashMap<String, Map<String, Double>>();
 		vocabulary = ExtractVocabulary(folder);
 		countNumberOfDocs = CountNumberOfDocs(folder);
+		priormap = new HashMap<String, Double>();
 		for(String sort : c){
 			Map<String, Double> tempMap = new HashMap<String, Double>();
 			countDocsInClass = countDocsInClass(sort, folder);
 			vocabularyInClass = ConcatenateAllTextsOfDocsInClass(sort, folder);
+			priormap.put(sort, (double)countDocsInClass/countNumberOfDocs);
 			for(String t : vocabulary) {
 				double chance = 0;
 				int countOfWord = 0;
@@ -51,20 +59,33 @@ public class Classifier {
 					}
 				}
 				chance = (countOfWord+1)/(countOfAllWords+2);
-				System.out.println(chance);
 				tempMap.put(t, chance);
 			}
 			map.put(sort, tempMap);
+			
 		}
 	}
 	
-	public void ApplyBinominalNaiveBayes(String[] c, File file){
-		List<String> vocabularyOfFile = ExtractVocabulary(file);
+	public String ApplyBinominalNaiveBayes(String[] c, File file, File folder){
+		List<String> vocabularyOfFile = ExtractVocabularyFromFile(file);
 		Map<String, Double> classA = map.get(c[0]);
 		Map<String, Double> classB = map.get(c[1]);
-		for(String word : vocabularyOfFile) {
-			
-		}
+		Map<String, Double> determineMap = new HashMap<String, Double>();
+		for(String sort : c) {
+			double score = Math.log(priormap.get(sort));
+			vocabularyInClass = ConcatenateAllTextsOfDocsInClass(sort, folder);
+			 for(String t : vocabularyInClass){
+				 score += Math.log(map.get(t).get(sort));
+			 } determineMap.put(sort, score); 
+		} 
+		Entry<String,Double> maxEntry = null;
+		for(Entry<String,Double> entry : determineMap.entrySet()) {
+		    if (maxEntry == null || entry.getValue() > maxEntry.getValue()) {
+		        maxEntry = entry;
+		    }
+		} 
+		System.out.println(maxEntry.getKey());
+		return maxEntry.getKey();
 	}
 
 	private static List<String> ConcatenateAllTextsOfDocsInClass(String c, File folder) {
@@ -135,5 +156,30 @@ public class Classifier {
 			}
 		}	
 		return files;
+	}
+	public List<String> ExtractVocabularyFromFile(File file){
+		List<String> tokenizedResult = new ArrayList<String>();
+		String result = null;
+		//files = fileLister(folder);
+		
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(file));
+			while(br.ready()) {
+				result += br.readLine();
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			tokenizedResult = new Tokenizer().tokenizer(result);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return tokenizedResult;
+		
 	}
 }
