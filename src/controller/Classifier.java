@@ -62,7 +62,7 @@ public class Classifier {
 						countOfWord++;
 					}
 				}
-				chance = (countOfWord+1)/(countOfAllWords+2);
+				chance = Math.log(countOfWord+1) - Math.log(countOfAllWords+2);
 				System.out.println("chance = " + t + chance);
 				tempMap.put(t, chance);
 			}
@@ -82,7 +82,7 @@ public class Classifier {
 			vocabularyInClass = ConcatenateAllTextsOfDocsInClass(sort, folder);
 			 for(String t : vocabularyInClass){
 				 score += Math.log(map.get(sort).get(t));
-				 System.out.println("Score t:" + score);
+				 //System.out.println("Score t:" + score);
 			 } 
 			 determineMap.put(sort, score); 
 		} 
