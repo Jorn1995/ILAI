@@ -26,21 +26,6 @@ public class Classifier {
 	Map<String, Double> priormap;
 	Classifier classifier;
 
-	public static void main(String[] args) {
-		
-		String path = new File("").getAbsolutePath()+"\\Train\\blogs";
-		String testfilepath = new File("").getAbsolutePath()+"\\Test\\blogs\\M\\M-test11.txt";
-		File test = new File(path);
-		File testfile = new File(testfilepath);
-		String[] classes = new String[2];
-		classes[0] = "M";
-		classes[1] = "F";
-		Classifier classifier = new Classifier();
-		classifier.TrainBinominalNaiveBayes(classes, test);
-		classifier.ApplyBinominalNaiveBayes(classes, testfile, test);
-
-	}
-
 	public void TrainBinominalNaiveBayes(String[] c, File folder) {
 		map = new HashMap<String, Map<String, Double>>();
 		vocabulary = ExtractVocabulary(folder);
