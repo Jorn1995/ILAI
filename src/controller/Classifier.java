@@ -23,10 +23,11 @@ public class Classifier {
 	static File[] files = new File[0];
 	Map<String, Map<String, Double>> map;
 	Map<String, Double> priormap;
+	Classifier classifier;
 
 	public static void main(String[] args) {
 		String path = new File("").getAbsolutePath()+"\\Train\\blogs";
-		String testfilepath = new File("").getAbsolutePath()+"\\Train\\testfile\\F-test20.txt";
+		String testfilepath = new File("").getAbsolutePath()+"\\Test\\blogs\\M\\M-test11.txt";
 		File test = new File(path);
 		File testfile = new File(testfilepath);
 		String[] classes = new String[2];
@@ -75,8 +76,9 @@ public class Classifier {
 			double score = Math.log(priormap.get(sort));
 			vocabularyInClass = ConcatenateAllTextsOfDocsInClass(sort, folder);
 			 for(String t : vocabularyInClass){
-				 score += Math.log(map.get(t).get(sort));
-			 } determineMap.put(sort, score); 
+				 score += Math.log(map.get(sort).get(t));
+			 } 
+			 determineMap.put(sort, score); 
 		} 
 		Entry<String,Double> maxEntry = null;
 		for(Entry<String,Double> entry : determineMap.entrySet()) {
