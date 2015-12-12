@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -26,6 +27,7 @@ public class Classifier {
 	Classifier classifier;
 
 	public static void main(String[] args) {
+		
 		String path = new File("").getAbsolutePath()+"\\Train\\blogs";
 		String testfilepath = new File("").getAbsolutePath()+"\\Test\\blogs\\M\\M-test11.txt";
 		File test = new File(path);
@@ -50,7 +52,7 @@ public class Classifier {
 			vocabularyInClass = ConcatenateAllTextsOfDocsInClass(sort, folder);
 			priormap.put(sort, (double)countDocsInClass/countNumberOfDocs);
 			for(String t : vocabulary) {
-				double chance = 0;
+				double chance = 0.0;
 				int countOfWord = 0;
 				int countOfAllWords = 0;
 				for(String s : vocabularyInClass) {
@@ -60,6 +62,7 @@ public class Classifier {
 					}
 				}
 				chance = (countOfWord+1)/(countOfAllWords+2);
+				System.out.println("chance = " + t + chance);
 				tempMap.put(t, chance);
 			}
 			map.put(sort, tempMap);
@@ -74,9 +77,11 @@ public class Classifier {
 		Map<String, Double> determineMap = new HashMap<String, Double>();
 		for(String sort : c) {
 			double score = Math.log(priormap.get(sort));
+			System.out.println("Score sort:" + score);
 			vocabularyInClass = ConcatenateAllTextsOfDocsInClass(sort, folder);
 			 for(String t : vocabularyInClass){
 				 score += Math.log(map.get(sort).get(t));
+				 System.out.println("Score t:" + score);
 			 } 
 			 determineMap.put(sort, score); 
 		} 
