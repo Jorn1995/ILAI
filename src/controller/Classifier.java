@@ -55,7 +55,7 @@ public class Classifier {
 			Map<String, Double> tempMap = new HashMap<String, Double>();
 			File[] DocsInClass = getDocsInClass(sort, folder);
 			int countDocsInClass = countDocsInClass(sort, folder);
-			priormap.put(sort, (double)countDocsInClass/countNumberOfDocs);
+			priormap.put(sort, ((double)countDocsInClass/countNumberOfDocs));
 			for(String t : vocabulary) {
 				if(!tempMap.containsKey(t)){
 					int countDocsContainingWord = 0;
@@ -88,12 +88,11 @@ public class Classifier {
 		for(String sort : c) {
 			List<String> vocabularyInClass = ConcatenateAllTextsOfDocsInClass(sort, folder);
 			double score = Math.log(priormap.get(sort));
+			System.out.println(score);
 			for(String t : vocabularyInClass) {
 				if(termsFromDoc.contains(t)) {
 					score += Math.log(map.get(sort).get(t));
 				} else {
-					System.out.println(map.get(sort));
-					System.out.println("Chance: " + map.get(sort).get(t));
 					score += Math.log((((double)1)-(map.get(sort).get(t))));
 				}
 			}
@@ -127,26 +126,11 @@ public class Classifier {
 	}
 
 	private static List<String> ExtractVocabulary(File folder) {
-		files = fileLister(folder);
 		List<String> tokenizedResult = new ArrayList<String>();
-		String result = "";
-		for (File file : files) {
-			try {
-				String line ="";
-				BufferedReader br = new BufferedReader(new FileReader(file));
-				while(br.ready()) {
-					result += br.readLine();
-				}
-			} catch (FileNotFoundException e) {
-
-			} catch (IOException e) {
-				e.printStackTrace();
+		for(File doc: fileLister(folder)) {
+			for(String line : ExtractVocabularyFromFile(doc)) {
+				tokenizedResult.add(line);
 			}
-		}
-		try {
-			tokenizedResult = new Tokenizer().tokenizer(result);
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 		return tokenizedResult;
 	}
@@ -179,11 +163,9 @@ public class Classifier {
 		}	
 		return files;
 	}
-	public List<String> ExtractVocabularyFromFile(File file){
+	public static List<String> ExtractVocabularyFromFile(File file){
 		List<String> tokenizedResult = new ArrayList<String>();
 		String result = null;
-		//files = fileLister(folder);
-
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			while(br.ready()) {
