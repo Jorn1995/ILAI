@@ -62,7 +62,7 @@ public class Classifier {
 						countOfWord++;
 					}
 				}
-				chance = Math.log(countOfWord+1) - Math.log(countOfAllWords+2);
+				chance = Math.log(countOfWord+1) -(countOfAllWords+2);
 				System.out.println("chance = " + t + chance);
 				tempMap.put(t, chance);
 			}
@@ -72,17 +72,14 @@ public class Classifier {
 	}
 	
 	public String ApplyBinominalNaiveBayes(String[] c, File file, File folder){
-		List<String> vocabularyOfFile = ExtractVocabularyFromFile(file);
-		Map<String, Double> classA = map.get(c[0]);
-		Map<String, Double> classB = map.get(c[1]);
 		Map<String, Double> determineMap = new HashMap<String, Double>();
 		for(String sort : c) {
 			double score = Math.log(priormap.get(sort));
 			System.out.println("Score sort:" + score);
 			vocabularyInClass = ConcatenateAllTextsOfDocsInClass(sort, folder);
 			 for(String t : vocabularyInClass){
-				 score += Math.log(map.get(sort).get(t));
-				 //System.out.println("Score t:" + score);
+				 score += map.get(sort).get(t);
+				 System.out.println("Score t:" + score);
 			 } 
 			 determineMap.put(sort, score); 
 		} 
