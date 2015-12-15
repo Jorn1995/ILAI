@@ -17,9 +17,7 @@ import java.util.Map.Entry;
 public class Classifier {
 
 	List<String> vocabulary;
-	List<String> vocabularyInClass;
 	int countNumberOfDocs;
-	int countDocsInClass;
 	float prior;
 	static File[] files = new File[0];
 	Map<String, Map<String, Double>> map;
@@ -28,17 +26,23 @@ public class Classifier {
 
 
 	public static void main(String[] args) {
-		
+
 		String path = new File("").getAbsolutePath()+"\\Train\\blogs";
-		String testfilepath = new File("").getAbsolutePath()+"\\Test\\blogs\\M\\M-test11.txt";
+		File testfile1 = new File(new File("").getAbsolutePath()+"\\Test\\blogs\\M\\M-test11.txt");
+		File testfile2 = new File(new File("").getAbsolutePath()+"\\Test\\blogs\\M\\M-test44.txt");
+		File testfile3 = new File(new File("").getAbsolutePath()+"\\Test\\blogs\\F\\F-test10.txt");
+		File testfile4 = new File(new File("").getAbsolutePath()+"\\Test\\blogs\\F\\F-test19.txt");
 		File test = new File(path);
-		File testfile = new File(testfilepath);
 		String[] classes = new String[2];
 		classes[0] = "M";
 		classes[1] = "F";
 		Classifier classifier = new Classifier();
 		classifier.TrainBinominalNaiveBayes(classes, test);
-		classifier.ApplyBinominalNaiveBayes(classes, testfile, test);
+		classifier.ApplyBinominalNaiveBayes(classes, testfile1, test);
+		classifier.ApplyBinominalNaiveBayes(classes, testfile2, test);
+		classifier.ApplyBinominalNaiveBayes(classes, testfile3, test);
+		classifier.ApplyBinominalNaiveBayes(classes, testfile4, test);
+
 
 	}
 
@@ -49,45 +53,58 @@ public class Classifier {
 		priormap = new HashMap<String, Double>();
 		for(String sort : c){
 			Map<String, Double> tempMap = new HashMap<String, Double>();
-			countDocsInClass = countDocsInClass(sort, folder);
-			vocabularyInClass = ConcatenateAllTextsOfDocsInClass(sort, folder);
+			File[] DocsInClass = getDocsInClass(sort, folder);
+			int countDocsInClass = countDocsInClass(sort, folder);
 			priormap.put(sort, (double)countDocsInClass/countNumberOfDocs);
 			for(String t : vocabulary) {
-				double chance = 0.0;
-				int countOfWord = 0;
-				int countOfAllWords = 0;
-				for(String s : vocabularyInClass) {
-					countOfAllWords++;
-					if(t.equals(s)) {
-						countOfWord++;
+				if(!tempMap.containsKey(t)){
+					int countDocsContainingWord = 0;
+					for(File doc : DocsInClass) {
+						List<String> wordsInFile = ExtractVocabularyFromFile(doc);
+						if(wordsInFile.contains(t)) {
+							countDocsContainingWord++;
+						}
 					}
+					double chance = ((double)countDocsContainingWord+1)/((double)countDocsInClass+2);
+					System.out.println("word: " + t + "    " + "countDocsContainingWord: " + countDocsContainingWord  + "    " 
+							+ "countDocsInClass:" + countDocsInClass + "    " + "chance: " + chance + "class: " + sort);
+					tempMap.put(t, chance);
 				}
-				chance = Math.log(countOfWord+1) -(countOfAllWords+2);
-				System.out.println("chance = " + t + chance);
-				tempMap.put(t, chance);
 			}
 			map.put(sort, tempMap);
-			
+
 		}
 	}
-	
+
+	private File[] getDocsInClass(String sort, File folder) {
+		File folderOfClass = new File (folder.getAbsolutePath()+"\\"+sort);
+		File[] filesOfClass = fileLister(folderOfClass);
+		return filesOfClass;
+	}
+
 	public String ApplyBinominalNaiveBayes(String[] c, File file, File folder){
 		Map<String, Double> determineMap = new HashMap<String, Double>();
+		List<String> termsFromDoc = ExtractVocabularyFromFile(file);
 		for(String sort : c) {
+			List<String> vocabularyInClass = ConcatenateAllTextsOfDocsInClass(sort, folder);
 			double score = Math.log(priormap.get(sort));
-			System.out.println("Score sort:" + score);
-			vocabularyInClass = ConcatenateAllTextsOfDocsInClass(sort, folder);
-			 for(String t : vocabularyInClass){
-				 score += map.get(sort).get(t);
-				 System.out.println("Score t:" + score);
-			 } 
-			 determineMap.put(sort, score); 
-		} 
+			for(String t : vocabularyInClass) {
+				if(termsFromDoc.contains(t)) {
+					score += Math.log(map.get(sort).get(t));
+				} else {
+					System.out.println(map.get(sort));
+					System.out.println("Chance: " + map.get(sort).get(t));
+					score += Math.log((((double)1)-(map.get(sort).get(t))));
+				}
+			}
+			determineMap.put(sort, score); 
+			System.out.println(score);
+		}
 		Entry<String,Double> maxEntry = null;
 		for(Entry<String,Double> entry : determineMap.entrySet()) {
-		    if (maxEntry == null || entry.getValue() > maxEntry.getValue()) {
-		        maxEntry = entry;
-		    }
+			if (maxEntry == null || entry.getValue() > maxEntry.getValue()) {
+				maxEntry = entry;
+			}
 		} 
 		System.out.println(maxEntry.getKey());
 		return maxEntry.getKey();
@@ -166,7 +183,7 @@ public class Classifier {
 		List<String> tokenizedResult = new ArrayList<String>();
 		String result = null;
 		//files = fileLister(folder);
-		
+
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			while(br.ready()) {
@@ -177,14 +194,14 @@ public class Classifier {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		try {
 			tokenizedResult = new Tokenizer().tokenizer(result);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return tokenizedResult;
-		
+
 	}
 }
