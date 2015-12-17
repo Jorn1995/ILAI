@@ -27,23 +27,24 @@ public class Classifier {
 
 	public static void main(String[] args) {
 
-		String path = new File("").getAbsolutePath()+"\\Train\\blogs";
-		File testfile1 = new File(new File("").getAbsolutePath()+"\\Test\\blogs\\M\\M-test11.txt");
-		File testfile2 = new File(new File("").getAbsolutePath()+"\\Test\\blogs\\M\\M-test44.txt");
-		File testfile3 = new File(new File("").getAbsolutePath()+"\\Test\\blogs\\F\\F-test10.txt");
-		File testfile4 = new File(new File("").getAbsolutePath()+"\\Test\\blogs\\F\\F-test19.txt");
+		String path = new File("").getAbsolutePath()+"\\Train\\corpus-mails";
 		File test = new File(path);
-		String[] classes = new String[2];
-		classes[0] = "M";
-		classes[1] = "F";
-		Classifier classifier = new Classifier();
-		classifier.TrainBinominalNaiveBayes(classes, test);
-		classifier.ApplyBinominalNaiveBayes(classes, testfile1, test);
-		classifier.ApplyBinominalNaiveBayes(classes, testfile2, test);
-		classifier.ApplyBinominalNaiveBayes(classes, testfile3, test);
-		classifier.ApplyBinominalNaiveBayes(classes, testfile4, test);
-
-
+		ExtractVocabulary(test);
+		//		String testPathF = new File("").getAbsolutePath()+"\\Test\\blogs\\F";
+		//		String testPathM = new File("").getAbsolutePath()+"\\Test\\blogs\\M";
+		//		String[] classes = new String[2];
+		//		classes[0] = "M";
+		//		classes[1] = "F";
+		//		Classifier classifier = new Classifier();
+		//		classifier.TrainBinominalNaiveBayes(classes, test);
+		//		for (File file : new File(testPathF).listFiles()){
+		//			System.out.println("Vrouw");
+		//			classifier.ApplyBinominalNaiveBayes(classes, file, test);
+		//		}
+		//		for (File file : new File(testPathM).listFiles()){
+		//			System.out.println("Man");
+		//			classifier.ApplyBinominalNaiveBayes(classes, file, test);
+		//		}
 	}
 
 	public void TrainBinominalNaiveBayes(String[] c, File folder) {
@@ -138,29 +139,33 @@ public class Classifier {
 	private static File[] fileLister(File folder) {
 		files = new File[0];
 		File[] filesInFolder = folder.listFiles();
-		for (File file : filesInFolder) {
-			if(file.isDirectory()) {
-				File[] temp = files;
-				File[] directory = fileLister(file);	
-				files = new File[temp.length+directory.length];
-				for(int i = 0; i<temp.length; i++) {
-					files[i] = temp[i];
+		if (filesInFolder != null) {
+			for (File file : filesInFolder) {
+				if(file.isDirectory()) {
+					File[] temp = files;
+					File[] directory = fileLister(file);	
+					files = new File[temp.length+directory.length];
+					for(int i = 0; i<temp.length; i++) {
+						files[i] = temp[i];
+					}
+					for(int j = temp.length ; j<(temp.length+directory.length); j++) {
+						files[j] = directory[j-temp.length];
+					}
+				} else {
+					File[] temp = new File[files.length];
+					for(int i = 0; i<temp.length; i++) {
+						temp[i] = files[i];
+					}
+					files = new File[temp.length+1];
+					for(int i = 0; i<temp.length; i++) {
+						files[i] = temp[i];
+					}
+					files[temp.length] = file;
 				}
-				for(int j = temp.length ; j<(temp.length+directory.length); j++) {
-					files[j] = directory[j-temp.length];
-				}
-			} else {
-				File[] temp = new File[files.length];
-				for(int i = 0; i<temp.length; i++) {
-					temp[i] = files[i];
-				}
-				files = new File[temp.length+1];
-				for(int i = 0; i<temp.length; i++) {
-					files[i] = temp[i];
-				}
-				files[temp.length] = file;
 			}
-		}	
+		}	else {
+			return null;
+		}
 		return files;
 	}
 	public static List<String> ExtractVocabularyFromFile(File file){
