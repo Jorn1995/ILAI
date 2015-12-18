@@ -23,6 +23,7 @@ public class Classifier {
 	Map<String, Map<String, Double>> map;
 	Map<String, Double> priormap;
 	Classifier classifier;
+	static Map<String, List<String>> fileMap;
 
 
 	public static void main(String[] args) {
@@ -37,14 +38,23 @@ public class Classifier {
 				classes[1] = "F";
 				Classifier classifier = new Classifier();
 				classifier.TrainBinominalNaiveBayes(classes, test);
+				int i = 0;
 				for (File file : new File(testPathF).listFiles()){
-					System.out.println("Vrouw");
-					classifier.ApplyBinominalNaiveBayes(classes, file, test);
+					String result = classifier.ApplyBinominalNaiveBayes(classes, file, test);
+					System.out.println("expected class = F");
+					if(result == "F") {
+						i++;
+						
+					}
 				}
 				for (File file : new File(testPathM).listFiles()){
-					System.out.println("Man");
-					classifier.ApplyBinominalNaiveBayes(classes, file, test);
+					String result = classifier.ApplyBinominalNaiveBayes(classes, file, test);
+					System.out.println("expected class = M");
+					if(result == "M") {
+						i++;
+					}
 				}
+				System.out.println(((double)i/50.0));
 	}
 
 	public void TrainBinominalNaiveBayes(String[] c, File folder) {
@@ -61,7 +71,7 @@ public class Classifier {
 				if(!tempMap.containsKey(t)){
 					int countDocsContainingWord = 0;
 					for(File doc : DocsInClass) {
-						List<String> wordsInFile = ExtractVocabularyFromFile(doc);
+						List<String> wordsInFile = fileMap.get(doc.getName());
 						if(wordsInFile.contains(t)) {
 							countDocsContainingWord++;
 						}
@@ -89,7 +99,6 @@ public class Classifier {
 		for(String sort : c) {
 			List<String> vocabularyInClass = ConcatenateAllTextsOfDocsInClass(sort, folder);
 			double score = Math.log(priormap.get(sort));
-			System.out.println(score);
 			for(String t : vocabularyInClass) {
 				if(termsFromDoc.contains(t)) {
 					score += Math.log(map.get(sort).get(t));
@@ -97,16 +106,17 @@ public class Classifier {
 					score += Math.log((((double)1)-(map.get(sort).get(t))));
 				}
 			}
-			determineMap.put(sort, score); 
-			System.out.println(score);
+			System.out.println("class: " + sort + " score: " + score);
+			determineMap.put(sort, score);
 		}
+		
 		Entry<String,Double> maxEntry = null;
 		for(Entry<String,Double> entry : determineMap.entrySet()) {
 			if (maxEntry == null || entry.getValue() > maxEntry.getValue()) {
 				maxEntry = entry;
 			}
 		} 
-		System.out.println(maxEntry.getKey());
+		System.out.println("result class: " + maxEntry.getKey());
 		return maxEntry.getKey();
 	}
 
@@ -128,10 +138,13 @@ public class Classifier {
 
 	private static List<String> ExtractVocabulary(File folder) {
 		List<String> tokenizedResult = new ArrayList<String>();
+		fileMap = new HashMap<String, List<String>>();
 		for(File doc: fileLister(folder)) {
-			for(String line : ExtractVocabularyFromFile(doc)) {
+			List<String> temp = ExtractVocabularyFromFile(doc);
+			for(String line : temp) {
 				tokenizedResult.add(line);
 			}
+			fileMap.put(doc.getName(), temp);
 		}
 		return tokenizedResult;
 	}
