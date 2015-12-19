@@ -79,7 +79,9 @@ public class Classifier {
 					double chance = ((double)countDocsContainingWord+1)/((double)countDocsInClass+2);
 					System.out.println("word: " + t + "    " + "countDocsContainingWord: " + countDocsContainingWord  + "    " 
 							+ "countDocsInClass:" + countDocsInClass + "    " + "chance: " + chance + "class: " + sort);
+			
 					tempMap.put(t, chance);
+					
 				}
 			}
 			map.put(sort, tempMap);
@@ -99,11 +101,11 @@ public class Classifier {
 		for(String sort : c) {
 			List<String> vocabularyInClass = ConcatenateAllTextsOfDocsInClass(sort, folder);
 			double score = Math.log(priormap.get(sort));
-			for(String t : vocabularyInClass) {
-				if(termsFromDoc.contains(t)) {
+			for(String t : termsFromDoc) {
+				if(map.get(sort).containsKey(t)) {
 					score += Math.log(map.get(sort).get(t));
-				} else {
-					score += Math.log((((double)1)-(map.get(sort).get(t))));
+//				} else {
+//				score += Math.log((((double)1)-(map.get(sort).get(t))));
 				}
 			}
 			System.out.println("class: " + sort + " score: " + score);
