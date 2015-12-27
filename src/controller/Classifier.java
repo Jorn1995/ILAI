@@ -150,7 +150,7 @@ public class Classifier {
 		return tokenizedResult;
 	}
 
-	private static File[] fileLister(File folder) {
+	public static File[] fileLister(File folder) {
 		files = new File[0];
 		File[] filesInFolder = folder.listFiles();
 		for (File file : filesInFolder) {

@@ -1,6 +1,7 @@
 package views;
 
 import java.awt.EventQueue;
+
 import java.io.File;
 
 import javax.swing.JComboBox;
@@ -17,7 +18,6 @@ import javax.swing.JTextField;
 public class Start {
 
 	private JFrame frame;
-	private JTextField txtGetraind;
 
 	/**
 	 * Launch the application.
@@ -78,52 +78,19 @@ public class Start {
 					classes[i] = classDirFiles[i].getName();
 				}
 				classifier.TrainBinominalNaiveBayes(classes, new File(new File("").getAbsolutePath()+"\\Train\\"+cmboitem));	
-				txtGetraind = new JTextField();
-				txtGetraind.setText("Getraind!");
-				panel.add(txtGetraind);
-				txtGetraind.setColumns(10);
+				EventQueue.invokeLater(new Runnable() {
+					public void run() {
+						try {
+							TestFile window = new views.TestFile(cmboitem, classifier);
+							window.getFrame().setVisible(true);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				});
 			}
 		});
 		panel.add(btnTrain);
-		
-//		File classDir = new File(new File("").getAbsolutePath()+"\\Test\\"+cmboitem);
-//		String[] classes = new String[classDir.listFiles().length];
-//		File[] classDirFiles = classDir.listFiles();
-//		for (int i = 0; i< classDirFiles.length; i++) {
-//			classes[i] = classDirFiles[i].getName();
-//		}
-//		JComboBox jComboBox2 = new JComboBox();
-//		for(String folder : classes) {
-//			jComboBox2.addItem(folder);
-//		}
-//		panel.add(jComboBox2);
-//		jComboBox2.
-//		String cmboitem2 = (String) jComboBox2.getSelectedItem();
-//		
-//		File fileDir = new File(classDir.getAbsolutePath()+ "\\" +cmboitem2);
-//		String[] files = new String[fileDir.listFiles().length];
-//		File[] fileArray = fileDir.listFiles();
-//		for (int i = 0; i< fileArray.length; i++) {
-//			files[i] = fileArray[i].getName();
-//		}
-//		JComboBox jComboBox3 = new JComboBox();
-//		for(String folder : files) {
-//			jComboBox3.addItem(folder);
-//		}
-//		panel.add(jComboBox3);
-//		File testFile = new File(fileDir.getAbsolutePath() + "\\" + (String) jComboBox3.getSelectedItem());
-//		
-//		JButton btnTest = new JButton("Test");
-//		btnTest.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {				
-//				String result = classifier.ApplyBinominalNaiveBayes(choices, testFile, classDir);
-//				txtGetraind = new JTextField();
-//				txtGetraind.setText("Getest: " + result);
-//				panel.add(txtGetraind);
-//				txtGetraind.setColumns(10);
-//			}
-//		});
-//		panel.add(btnTest);
 	    
 	}
 
