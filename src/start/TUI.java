@@ -55,6 +55,8 @@ public class TUI {
 			File[] filesintestfolder = testrealpath.listFiles();
 			int i = 0;
 			int totalTestCount = 0;
+			File newfile = null;
+			String rightfolder = "";
 			if (filesnames.contains(testclass)) {
 				if (testrealpath.isDirectory()) {
 					for (File testfolders : filesintestfolder) {
@@ -66,57 +68,38 @@ public class TUI {
 									.ApplyBinominalNaiveBayes(classes, file,
 											testrealpath);
 							System.out.println("filename = " + file.getName());
-							System.out.println("Name = "
-									+ file.getName() + " result = "
-									+ result);
+							System.out.println("Name = " + file.getName()
+									+ " result = " + result);
 							System.out.println("Is " + result
-									+ " the right class for "
-									+ file.getName() + "? Y/N");
+									+ " the right class for " + file.getName()
+									+ "? Y/N");
 							String feedback = user_input.next();
 							if (feedback.equals("Y") || feedback.equals("y")) {
-								try {
-									File newfile = new File(
-											trainrealpath.getAbsolutePath()
-													+ "\\" + result + "\\"
-													+ file.getName());
-									newfile.createNewFile();
-									PrintWriter writer = new PrintWriter(
-											newfile.getAbsolutePath(), "UTF-8");
-									writer.println(Classifier
-											.ReadFile(file));
-									System.out.println("File added to "
-											+ result + " increase accuracy");
-									writer.close();
-								} catch (IOException e) {
-									e.printStackTrace();
-								}
+								newfile = new File(
+										trainrealpath.getAbsolutePath() + "\\"
+												+ result + "\\"
+												+ file.getName());
 							} else if (feedback.equals("N")
 									|| feedback.equals("n")) {
-								try {
-									System.out
-											.println("To which folder does the test file have to be added in order to increase accuracy? The relative path to the train set "
-													+ file
-															.getAbsolutePath());
-									String rightfolder = user_input.next();
-									File newfile = new File(
-											trainrealpath.getAbsolutePath()
-													+ "\\" + rightfolder + "\\"
-													+ file.getName());
-									newfile.createNewFile();
-									System.out.println(newfile
-											.getAbsolutePath());
-									PrintWriter writer = new PrintWriter(
-											newfile.getAbsolutePath(), "UTF-8");
-									writer.println(Classifier
-											.ReadFile(file));
-									System.out.println("File added to "
-											+ rightfolder
-											+ " increase accuracy");
-									writer.close();
-								} catch (IOException e) {
-									e.printStackTrace();
-								}
-
+								System.out
+										.println("To which class does the test file have to be copied?");
+								rightfolder = user_input.next();
+								newfile = new File(
+										trainrealpath.getAbsolutePath() + "\\"
+												+ rightfolder + "\\"
+												+ file.getName());
+							}
+							try {
+								newfile.createNewFile();
+								System.out.println(newfile.getAbsolutePath());
+								PrintWriter writer = new PrintWriter(
+										newfile.getAbsolutePath(), "UTF-8");
+								writer.println(Classifier.ReadFile(file));
+								System.out.println("File added to "
+										+ rightfolder + " increase accuracy");
+								writer.close();
+							} catch (IOException e) {
+								e.printStackTrace();
 							}
 						}
 					}
@@ -129,46 +112,31 @@ public class TUI {
 							+ testrealpath.getName() + "? Y/N");
 					String feedback = user_input.next();
 					if (feedback.equals("Y") || feedback.equals("y")) {
-						try {
-							File newfile = new File(
-									trainrealpath.getAbsolutePath() + "\\"
-											+ result + "\\"
-											+ testrealpath.getName());
-							newfile.createNewFile();
-							PrintWriter writer = new PrintWriter(
-									newfile.getAbsolutePath(), "UTF-8");
-							System.out.println("File added to " + result
-									+ " increase accuracy");
-							writer.close();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
+						newfile = new File(trainrealpath.getAbsolutePath()
+								+ "\\" + result + "\\" + testrealpath.getName());
 					} else if (feedback.equals("N") || feedback.equals("n")) {
-						try {
-							System.out
-									.println("To which folder does the test file have to be added in order to increase accuracy? The relative path to the train set "
-											+ trainrealpath.getAbsolutePath());
-							String rightfolder = user_input.next();
-							File newfile = new File(
-									trainrealpath.getAbsolutePath() + "\\"
-											+ rightfolder + "\\"
-											+ testrealpath.getName());
-							newfile.createNewFile();
-							System.out.println(newfile.getAbsolutePath());
-							PrintWriter writer = new PrintWriter(
-									newfile.getAbsolutePath(), "UTF-8");
-							writer.println(Classifier.ReadFile(testrealpath));
-							System.out.println("File added to " + rightfolder
-									+ " increase accuracy");
-							writer.close();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-
+						System.out
+								.println("To which class does the test file have to be copied?");
+						rightfolder = user_input.next();
+						newfile = new File(trainrealpath.getAbsolutePath()
+								+ "\\" + rightfolder + "\\"
+								+ testrealpath.getName());
 					}
+					try {
+
+						newfile.createNewFile();
+						System.out.println(newfile.getAbsolutePath());
+						PrintWriter writer = new PrintWriter(
+								newfile.getAbsolutePath(), "UTF-8");
+						writer.println(Classifier.ReadFile(testrealpath));
+						writer.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+
 					totalTestCount++;
 				}
-				
+
 			} else if (testclass.equals("exit")) {
 				System.out.println("The application will be terminated.");
 			} else {
