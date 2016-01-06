@@ -37,7 +37,7 @@ public class Result {
 		
 		JLabel txtResult;
 		txtResult = new JLabel();
-		txtResult.setText("Resultat: " + result);
+		txtResult.setText("Resultaat: " + result);
 		panel.add(txtResult);
 		
 	}
