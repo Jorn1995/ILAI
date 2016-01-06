@@ -60,8 +60,7 @@ public class TUI {
 			if (filesnames.contains(testclass)) {
 				if (testrealpath.isDirectory()) {
 					for (File testfolders : filesintestfolder) {
-						File[] t = new File(testfolders.getAbsolutePath())
-								.listFiles();
+						File[] t = Classifier.fileLister(testfolders);
 						for (File file : t) {
 							totalTestCount++;
 							String result = classifier
